@@ -86,7 +86,8 @@ export function nextBatchId(): string {
   const batches = loadBatches();
   const max = batches.reduce((acc, b) => {
     const m = b.batchId.match(/^HO-(\d{4})-(\d{3,})$/i);
-    return m ? Math.max(acc, parseInt(m[2], 10)) : acc;
+    const seq = m?.[2];
+    return seq ? Math.max(acc, parseInt(seq, 10)) : acc;
   }, 0);
   return `HO-2026-${String(max + 1).padStart(3, "0")}`;
 }
