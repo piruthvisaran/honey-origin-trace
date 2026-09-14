@@ -2,6 +2,7 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 
 import { QrScanner } from "@/components/QrScanner";
+import { SiteHeader } from "@/components/SiteHeader";
 import { NotFoundResult, VerifiedResult } from "@/components/VerificationResult";
 import { extractBatchId, lookupBatch, type Batch } from "@/lib/batches";
 
