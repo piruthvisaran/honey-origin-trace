@@ -55,29 +55,7 @@ function Index() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
-        <div className="mx-auto flex max-w-3xl items-center justify-between px-5 py-4">
-          <div className="flex items-center gap-2.5">
-            <span className="flex size-8 items-center justify-center rounded-md bg-primary">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="text-primary-foreground">
-                <path
-                  d="M12 2l7 4v6c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-4z"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinejoin="round"
-                />
-                <path d="M12 8v8M8.5 10.5h7M8.5 13.5h7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-              </svg>
-            </span>
-            <span className="font-display text-lg font-semibold tracking-tight text-foreground">
-              Honey Origin
-            </span>
-          </div>
-          <span className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-            Customer Verification
-          </span>
-        </div>
-      </header>
+      <SiteHeader />
 
       <main className="mx-auto max-w-3xl px-5">
         <section className="py-14 text-center sm:py-20">
