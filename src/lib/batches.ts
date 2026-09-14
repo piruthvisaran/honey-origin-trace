@@ -4,10 +4,13 @@ export interface Batch {
   farm: string;
   origin: string;
   location: string;
+  district?: string;
+  state?: string;
   contact: string;
   honeyType: string;
   harvestDate: string;
   quantity: string;
+  processingDate?: string;
   packagingDate: string;
   expiryDate: string;
 }
@@ -19,10 +22,13 @@ const SEED_BATCHES: Batch[] = [
     farm: "Green Bee Farm",
     origin: "Pollachi, Tamil Nadu",
     location: "Pollachi, Tamil Nadu",
+    district: "Coimbatore",
+    state: "Tamil Nadu",
     contact: "+91 98765 43210",
     honeyType: "Multifloral Honey",
     harvestDate: "20 August 2026",
     quantity: "25 kg",
+    processingDate: "22 August 2026",
     packagingDate: "24 August 2026",
     expiryDate: "24 August 2028",
   },
@@ -32,10 +38,13 @@ const SEED_BATCHES: Batch[] = [
     farm: "Golden Hive Apiary",
     origin: "Coimbatore, Tamil Nadu",
     location: "Coimbatore, Tamil Nadu",
+    district: "Coimbatore",
+    state: "Tamil Nadu",
     contact: "+91 98765 12345",
     honeyType: "Wildflower Honey",
     harvestDate: "28 August 2026",
     quantity: "20 kg",
+    processingDate: "29 August 2026",
     packagingDate: "30 August 2026",
     expiryDate: "30 August 2028",
   },
@@ -43,10 +52,16 @@ const SEED_BATCHES: Batch[] = [
 
 const STORAGE_KEY = "honey-origin-batches";
 
-function loadBatches(): Batch[] {
+export function loadBatches(): Batch[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw) as Batch[];
+    if (raw) {
+      const parsed = JSON.parse(raw) as Batch[];
+      // Merge in any seed batches not already stored (ids may differ)
+      const ids = new Set(parsed.map((b) => b.batchId));
+      const merged = [...parsed, ...SEED_BATCHES.filter((b) => !ids.has(b.batchId))];
+      return merged;
+    }
   } catch {
     // fall through to seed data
   }
@@ -64,4 +79,28 @@ export function lookupBatch(batchId: string): Batch | null {
 export function extractBatchId(scanned: string): string | null {
   const match = scanned.match(/HO-\d{4}-\d{3}/i);
   return match ? match[0].toUpperCase() : null;
+}
+
+/** Generates the next unique Batch ID, e.g. HO-2026-003. */
+export function nextBatchId(): string {
+  const batches = loadBatches();
+  const max = batches.reduce((acc, b) => {
+    const m = b.batchId.match(/^HO-(\d{4})-(\d{3,})$/i);
+    return m ? Math.max(acc, parseInt(m[2], 10)) : acc;
+  }, 0);
+  return `HO-2026-${String(max + 1).padStart(3, "0")}`;
+}
+
+export function createBatch(data: Omit<Batch, "batchId">): Batch {
+  const batches = loadBatches();
+  const batch: Batch = { ...data, batchId: nextBatchId() };
+  const stored = batches.filter((b) => b.batchId !== batch.batchId);
+  stored.push(batch);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
+  return batch;
+}
+
+/** QR payload format used on honey bottles. */
+export function qrPayload(batchId: string): string {
+  return `Honey Origin | Batch ID: ${batchId}`;
 }
